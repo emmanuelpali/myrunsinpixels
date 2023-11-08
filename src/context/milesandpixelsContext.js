@@ -1,4 +1,4 @@
-import { createContext, useReducer } from "react";
+import { createContext, useMemo, useReducer } from "react";
 import Firestore from "../handlers/firestore";
 
 export const Context = createContext()
@@ -7,6 +7,7 @@ const { readDocs } = Firestore
 
 const initialState = {
     items: photos, 
+    placeholders: photos, // Keeps track of the datafrom the database when there is a search term
     count: photos.length, 
     inputs: { title: null, description: null, file: null, path: null}, 
     isCollapsed: false
@@ -29,13 +30,21 @@ function reducer(state, action) {
         return {
           ...state, 
           items: [state.inputs, ...state.items],
+          placeholders: [state.inputs, ...state.items],
           count: state.items.length + 1, 
           inputs: { title: null, description: null, file: null, path: null}
         }
       case 'setItems':
         return {
           ...state,
-          items: action.payload.items
+          items: action.payload.items,
+          placeholders: action.payload.items,
+        }
+
+      case 'filterItems':
+        return {
+          ...state,
+          items: action.payload.results
         }
 
       case "setInputs": 
@@ -58,6 +67,27 @@ const Provider = ({ children }) => {
       const items = await readDocs("runs")
       dispatch({type: "setItems", payload: { items }})
     }
-    return <Context.Provider value={{ state, dispatch, readData }}>{children}</Context.Provider>
+
+    const filterItems = input => {
+      if(input === "" || !!input) {
+        dispatch({type: "setItems", payload: {items: state.placeholders}})
+      }
+      let list = state.placeholders.flat()
+      let results = list.filter((item) => {
+        const name = item.title.toLowerCase()
+        const searchInput = input.toLowerCase()
+        return name.indexOf(searchInput) > -1
+      })
+      
+      dispatch({type: "filterItems", payload: { results }})
+    }
+
+    const value = useMemo(() => {
+      return {
+        state, dispatch, readData, filterItems
+      }
+    },[state, dispatch, readData, filterItems])
+
+    return <Context.Provider value={value}>{children}</Context.Provider>
 }
 export default Provider;

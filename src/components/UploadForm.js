@@ -51,7 +51,7 @@ const UploadForm = () => {
         return !!Object.values(inputs).some(input => !input)
     }, [inputs])
     return (
-        isVisible && <>
+        isVisible && currentUser && <>
         <p className="display-6 text-center mb-3">Upload Stock Image</p>
         <div className="mb-5 d-flex align-items-center justify-content-center">
         <Preview />
@@ -81,7 +81,7 @@ const UploadForm = () => {
             </div>
             <button
               type="submit"
-              className="btn btn-success float-end"
+              className="btn btn-light float-end"
               disabled={isDisabled}
             >
               Save changes

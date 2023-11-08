@@ -22,11 +22,12 @@ function Card({ path, title, description, createdAt, user, id}) {
 
     }, [])
   return(
-      <div className="col-4 mb-5" onClick={handleClick}>
-          <div className="card" style={{width: "290px"}}>
+      <div className="col-md-4 mb-5 d-flex justify-content-center" onClick={handleClick}>
+          <div className="card p-1" style={{width: "290px"}}>
             <div className="" style={{
                 height: "250px",
                 backgroundImage: `url(${path})`,
+                backgroundPosition: 'bottom',
                 backgroundSize: "cover",
                 backgroundRepeat: "no-repeat"
             }}></div>

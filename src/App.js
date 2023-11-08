@@ -10,7 +10,7 @@ function App() {
   const { state, readData } = useContext(Context)
   const { authenticate } = useAuthContext();
   const count = useMemo(() => {
-    return `you have ${state.items.length} image${state.items.length > 1 ? 's': ''}`
+    return `You have ${state.items.length} Run${state.items.length > 1 ? 's': ''}`
   }, [state.items]);
 
   useEffect(() => {
@@ -21,7 +21,7 @@ function App() {
 
   return (
     <>
-        <h1 className="text-center">Gallery</h1>
+        <h1 className="text-center">Our Runs</h1>
         {count}
         <List items={state.items}/>
     </>

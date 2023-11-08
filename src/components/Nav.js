@@ -1,6 +1,8 @@
-import { useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { useAuthContext } from "../context/AuthContext";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useState } from "react";
+import { Context } from "../context/milesandpixelsContext";
 
 const LogIn = () => {
   const {login, currentUser } = useAuthContext() 
@@ -23,22 +25,55 @@ const LogOut = () => {
  };
 
 function Navigation() {
-  const { currentUser } = useAuthContext()
+  const { currentUser } = useAuthContext();
+  const { pathname } = useLocation();
     return(
       <ul className="navbar-nav me-auto mb-2 mb-lg-0">
       {/* remove all links except HOME */}
       <li className="nav-item">
-        <Link className="nav-link active" aria-current="page" to="/">
+        <Link className={`nav-link ${pathname === "/" ? "active" : ""}`} aria-current="page" to="/">
           Home
         </Link>
       </li>
       {currentUser && <li className="nav-item">
-        <Link className="nav-link active" aria-current="page" to="/myruns">
+        <Link className={`nav-link ${pathname === "/myruns" ? "active" : ""}`} aria-current="page" to="/myruns">
           My Runs
+        </Link>
+      </li>}
+      {currentUser && <li className="nav-item">
+        <Link className={`nav-link ${pathname === "/profile" ? "active" : ""}`} aria-current="page" to="/profile">
+          Profile
         </Link>
       </li>}
     </ul>
     )
+  }
+  function SearchForm() {
+    const [searchTerm, setSearchTerm] = useState(null)
+    const { filterItems: filter } = useContext(Context) 
+    const handleChange = (e) => {
+      setSearchTerm(e.target.value)
+      filter(e.target.value)
+    }
+    const handleSubmit = (e) => {
+      e.preventDefault()
+      filter(searchTerm)
+
+    }
+    return (
+      <form className="d-flex" onSubmit={handleSubmit}>
+        <input
+          className="form-control me-2"
+          type="search"
+          placeholder="Search"
+          aria-label="Search"
+          onChange={handleChange}
+        />
+        <button className="btn btn-outline-success" type="submit">
+          Search
+        </button>
+      </form>
+    );
   }
 
   
@@ -71,7 +106,7 @@ function Navigation() {
       <ul className="dropdown-menu" aria-labelledby="navbarDropdown">
         <li>
           <a className="dropdown-item text-center" href="#">
-            {username}
+            {currentUser && <Link to="/profile" >{username}</Link>}
           </a>
           <li><hr className="dropdown divider"/></li>
         </li>
@@ -86,7 +121,7 @@ function Navigation() {
   
   function Nav() {
       return(
-      <nav className="navbar navbar-expand-lg navbar-light bg-light mb-5">
+      <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-5">
       <div className="container-fluid">
         <Link className="navbar-brand" to="/">
           MILES&PIXELS
@@ -104,6 +139,7 @@ function Navigation() {
         </button>
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <Navigation />
+          <SearchForm />
           <Dropdown />
         </div>
       </div>
